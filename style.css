@@ -101,19 +101,23 @@ img {
 /* --- menu --- */
 #menu {
     background-image: url(./menu.png);
-    min-height: 100vh;
+    /* min-height: 100vh; */
+    height: 350px;
+    margin-bottom: 40px;
 }
 
-#menu .wrapper {
+.menu-content {
     text-align: center;
+    max-width: 560px;
+    margin-top: 2%;
 }
-#menu .page-title{
+.menu-content .page-title{
     color: #ffffff;
 }
-#menu .page-comment {
+.menu-content .page-comment {
     color: #ffffff;
 }
-#menu .list {
+.menu-content .list {
     margin-top: 50px;
     text-align: left;
     display: inline-block;
@@ -132,6 +136,55 @@ img {
     color: #ffffff;
     font-size: 1.25rem;
     text-transform: none;
+}
+.grid {
+    display: grid;
+    gap: 26px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin-top: 1%;
+    margin-bottom: 50px;
+}
+.big-box {
+    grid-column: 1 / 3;
+    grid-row: 1 / 3;
+}
+.big-box img {
+    height: 95%;
+    width: 100%;
+    object-fit: cover;
+}
+.item {
+    position: relative;
+}
+.item a {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%,-50%);
+    -webkit-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+    margin: 0;
+    padding: 0;
+    color: #009bc6;
+    font-size: 2rem;
+    text-transform: uppercase;
+    text-decoration:underline;/*下線を引く*/
+    text-decoration-color:#009bc6;/*下線を赤色*/
+}
+.item a:hover {
+    color: #99cc65;
+    text-decoration-color:#99cc65;/*下線を赤色*/
+}
+.item p {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    -ms-transform: translate(-50%,-50%);
+    -webkit-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+    margin: 0;
+    padding: 0;
+    color: #009bc6;
 }
 
 /* --- python etc --- */
@@ -239,7 +292,8 @@ article p {
 
 .image_beside {
     display:flex;
-    align-items: center
+    align-items: center;
+    gap: 10px;
 }
 /* .image-beside>div {
     width: 10%;
@@ -297,6 +351,15 @@ footer p{
     .page-header {
         flex-direction: column;
         align-items: center;
+    }
+
+    /* MENU */
+    .big-box {
+        grid-column: auto;
+        grid-row: auto;
+    }
+    .big-box img {
+        height: 100%;
     }
 
     /* STUDY */
