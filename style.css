@@ -331,7 +331,7 @@ footer p{
 /* --- レスポンシブ対応 --- */
 @media (max-width: 600px) {
     .post-title {
-        font-size: 2.5rem;
+        font-size: 1.5rem;
     }
 
     /* HEADER */
@@ -397,5 +397,9 @@ footer p{
     }
     .post-title, .post-cat {
         margin-left: 80px;
+    }
+
+    code {
+        font-size: 0.5rem;
     }
 }
