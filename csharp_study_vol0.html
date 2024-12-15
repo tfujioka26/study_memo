@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="python勉強中です。。">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>大人の学び舎 - python-study</title>
+
+    <!-- CSS -->
+    <link href="https://unpkg.com/ress/dist/ress.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <!-- <link href="vibrant-ink.css" rel="stylesheet"> -->
+    <link href="prettify.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    <!-- javascript -->
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+</head>
+
+<body>
+    <div id="study" class="big-bg">
+        <header class="page-header wrapper">
+            <h1>
+                <a href="index.html"><img class="logo" src="logo.png" alt="大人の学び舎ホーム"></a>
+            </h1>
+            <nav>
+                <ul class="main-nav">
+                    <li><a href="python_study_vol0.html">python</a></li>
+                    <li><a href="csharp_study_vol0.html">C#</a></li>
+                    <li><a href="excelvba_study_vol0.html">ExcelVBA</a></li>
+                    <li><a href="statistics_study_vol0.html">統計</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="wrapper">
+            <h2 class="page-title">python-study</h2>
+        </div>
+    </div>
+
+    <div class="study-contents wrapper">
+        <aside>
+            <h3 class="sub-title">カテゴリー</h3>
+            <ul class="sub-menu">
+                <li><a href="python_study_vol0.html">基本操作</a></li>
+                <li><a href="python_study_vol1.html">画像関連</a></li>
+                <li><a href="python_study_vol2.html">********</a></li>
+                <li><a href="python_study_vol3.html">********</a></li>
+            </ul>
+
+            <h3 class="sub-title-2nd">基本操作</h3>
+            <ul class="sub-menu">
+                <li><a href="#python-base-v0">ディレクトリ内のファイルをリストアップ</a></li>
+                <li><a href="#">********</a></li>
+                <li><a href="#">********</a></li>
+                <li><a href="#">********</a></li>
+            </ul>
+        </aside>
+
+        <article id="python-base-v0">
+            <header class="post-info">
+                <h2 class="post-title">ディレクトリ内のファイルをリストアップ</h2>
+                <p class="post-date">1/3 <span>2022</span></p>
+                <p class="post-cat">カテゴリー：基本操作</p>
+            </header>
+            <p>
+                標準モジュールのglobを使います。<br>
+                検索したい拡張子、フォルダなど指定できます。
+            </p>
+            <pre><code class="prettyprint">import glob
+files = glob.glob("*.jpg")
+print(files)</code></pre>
+
+            <p>
+                サブディレクトリまでリストアップするには、<br>
+                "**"とrecursive=Trueを記入します。
+            </p>
+            <pre><code class="prettyprint">[RelayCommand] 
+                private async Task DecompressFilesAsync() 
+                {
+                    //DecompressTest();
+                
+                    foreach (var file in Files)
+                    {
+                        await Task.Run(() => DecompressFile(file));
+                    }
+                
+                    System.Windows.MessageBox.Show("Comp");
+                }
+                
+                private void DecompressFile(FileInfoModel file) 
+                {
+                    string inputFile = file.FolderName + "\\" + file.FileName;
+                    string outputDirectory = Path.Combine(file.FolderName, Path.GetFileNameWithoutExtension(inputFile));
+                    Directory.CreateDirectory(outputDirectory);
+                
+                    Encoding detectedEncoding = DetectEncodingFromEntry(inputFile); //DetectEncoding
+                
+                    var options = new ReaderOptions
+                    {
+                        ArchiveEncoding = new ArchiveEncoding
+                        {
+                            Default = detectedEncoding
+                        }
+                    };
+                
+                    string extension = Path.GetExtension(inputFile);
+                    if (extension.ToLower() == ".zip" || extension.ToLower() == ".rar" || extension.ToLower() == ".7z")
+                    {
+                        using (var archive = ArchiveFactory.Open(inputFile, options))
+                        {
+                            double totalEntries = archive.Entries.Count();
+                            double processedEntries = 0;
+                            foreach (var entry in archive.Entries)
+                            {
+                                if (!entry.IsDirectory)
+                                {
+                                    entry.WriteToDirectory(outputDirectory, new ExtractionOptions { ExtractFullPath = true, Overwrite = true, PreserveFileTime = true, PreserveAttributes = false });
+                                }
+                                processedEntries++;
+                                file.Prog = Math.Round((processedEntries / totalEntries) * 100, 0);
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        double totalEntries = GetTotalEntries(inputFile, options);
+                
+                        using (Stream stream = System.IO.File.OpenRead(inputFile))
+                        using (var reader = ReaderFactory.Open(stream, options))
+                        {
+                            //double totalEntries = GetTotalEntries(reader);
+                            double processedEntries = 0;
+                
+                            while (reader.MoveToNextEntry())
+                            {
+                                if (!reader.Entry.IsDirectory)
+                                {
+                                    reader.WriteEntryToDirectory(outputDirectory,
+                                        new ExtractionOptions() { Overwrite = true, ExtractFullPath = true, PreserveFileTime = true, PreserveAttributes = false });
+                
+                                    processedEntries++;
+                                    file.Prog = Math.Round((processedEntries / totalEntries) * 100, 0);
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                private double GetTotalEntries(string filePath, ReaderOptions options)
+                {
+                    double totalEntries = 0;
+                
+                    using (Stream stream = System.IO.File.OpenRead(filePath))
+                    using (var reader = ReaderFactory.Open(stream, options))
+                    {
+                        while (reader.MoveToNextEntry())
+                        {
+                            if (!reader.Entry.IsDirectory)
+                            {
+                                totalEntries++;
+                            }
+                        }
+                    }
+                
+                    return totalEntries;
+                }
+                
+                private Encoding DetectEncodingFromEntry(string filePath)
+                {
+                    using (Stream stream = System.IO.File.OpenRead(filePath))
+                    using (var reader = ReaderFactory.Open(stream))
+                    {
+                        // エントリ名を解析してエンコーディングを判断
+                        while (reader.MoveToNextEntry())
+                        {
+                            string utf8EntryName = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(reader.Entry.Key));
+                            if (IsValidFileName(utf8EntryName))
+                            {
+                                return Encoding.UTF8;
+                            }
+                
+                            string shiftJisEntryName = Encoding.GetEncoding("Shift_JIS").GetString(Encoding.GetEncoding("Shift_JIS").GetBytes(reader.Entry.Key));
+                            if (IsValidFileName(shiftJisEntryName))
+                            {
+                                return Encoding.GetEncoding("Shift_JIS");
+                            }
+                        }
+                    }
+                
+                    // どちらのエンコーディングも有効でない場合、デフォルトでUTF-8を使用
+                    return Encoding.UTF8;
+                }
+                
+                //private Encoding DetectEncodingFromFileName(string filePath)
+                //{
+                //    string utf8EntryName = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes(filePath));
+                //    if (IsValidFileName(utf8EntryName))
+                //    {
+                //        return Encoding.UTF8;
+                //    }
+                
+                //    string shiftJisEntryName = Encoding.GetEncoding("Shift_JIS").GetString(Encoding.GetEncoding("Shift_JIS").GetBytes(filePath));
+                //    if (IsValidFileName(shiftJisEntryName))
+                //    {
+                //        return Encoding.GetEncoding("Shift_JIS");
+                //    }
+                
+                //    // どちらのエンコーディングも有効でない場合、デフォルトでUTF-8を使用
+                //    return Encoding.UTF8;
+                //}
+                
+                private bool IsValidFileName(string fileName)
+                {
+                    // ファイル名が有効かどうかを判定するロジック
+                    // 例として、制御文字や無効な文字が含まれていないかチェック
+                    return !fileName.Any(c => char.IsControl(c) && c != '\t' && c != '\n' && c != '\r');
+                }
+                
+                [RelayCommand]
+                private async Task CompressFilesAsync()
+                {
+                    string extension = ".tar";
+                    foreach (var file in Files)
+                    {
+                        await Task.Run(() => CompressFiles(file, extension));
+                    }
+                
+                    System.Windows.MessageBox.Show("Comp");
+                }
+                
+                private void CompressFiles(FileInfoModel file, string extension)
+                {
+                    //Encoding detectedEncoding = DetectEncodingFromFileName(file.FileName); //DetectEncoding
+                    Encoding detectedEncoding = Encoding.GetEncoding("Shift_JIS");
+                    switch (extension.ToLower())
+                    {
+                        case ".zip":
+                            CreateZipArchive(file, extension, detectedEncoding);
+                            break;
+                        case ".tar":
+                            CreateTarArchive(file, extension, detectedEncoding);
+                            break;
+                        case ".gz":
+                            CreateGZipArchive(file, extension, detectedEncoding);
+                            break;
+                        case ".bz2":
+                            CreateBZip2Archive(file, extension, detectedEncoding);
+                            break;
+                        case ".lz":
+                            CreateLZipArchive(file, extension, detectedEncoding);
+                            break;
+                        default:
+                            throw new NotSupportedException("Unsupported extension: " + extension);
+                    }
+                }
+                
+                private void CreateZipArchive(FileInfoModel file, string extension, Encoding encoding)
+                {
+                    string inputFilePath = file.FolderName + "\\" + file.FileName;
+                    string outputFilePath = file.FolderName + "\\" + Path.GetFileNameWithoutExtension(inputFilePath) + extension;
+                    //using (var archive = SharpCompress.Archives.Zip.ZipArchive.Create())
+                    //{
+                    //    using (var fileStream = System.IO.File.OpenRead(inputFilePath))
+                    //    {
+                    //        // 直接エントリを追加する
+                    //        //archive.AddEntry(file.FileName, fileStream, fileStream.Length);
+                    //        archive.AddEntry(file.FileName, fileStream);
+                    //        // プログレスバーの更新を別途行う
+                    //        CopyStreamWithProgress(fileStream, new MemoryStream(), file);
+                    //    }
+                
+                    //    using (var zipFileStream = System.IO.File.OpenWrite(outputFilePath))
+                    //    {
+                    //        archive.SaveTo(zipFileStream, new WriterOptions(CompressionType.Deflate));
+                    //    }
+                    //}
+                
+                    using (var archive = SharpCompress.Archives.Zip.ZipArchive.Create())
+                    {
+                        //archive.AddAllFromDirectory(file.FolderName, "*", SearchOption.TopDirectoryOnly);
+                        using (var fileStream = System.IO.File.OpenRead(inputFilePath))
+                        {
+                            // 直接エントリを追加する
+                            //archive.AddEntry(file.FileName, fileStream, fileStream.Length);
+                            archive.AddEntry(file.FileName, fileStream);
+                            // プログレスバーの更新を別途行う
+                            CopyStreamWithProgress(fileStream, new MemoryStream(), file);
+                            //archive.SaveTo(outputFilePath, new(CompressionType.Deflate) { ArchiveEncoding = new() { Default = Encoding.UTF8 } }); // ファイル名の文字化け対応
+                            archive.SaveTo(outputFilePath, new(CompressionType.Deflate) { ArchiveEncoding = new() { Default = encoding } }); // ファイル名の文字化け対応
+                        }
+                    }
+                }
+                
+                private void CreateTarArchive(FileInfoModel file, string extension, Encoding encoding)
+                {
+                    string inputFilePath = file.FolderName + "\\" + file.FileName;
+                    string outputFilePath = file.FolderName + "\\" + Path.GetFileNameWithoutExtension(inputFilePath) + extension;
+                    WriterOptions writerOptions = new WriterOptions(CompressionType.None) { LeaveStreamOpen = true };
+                    writerOptions.ArchiveEncoding.Default = encoding;
+                    using (var tarFileStream = System.IO.File.OpenWrite(outputFilePath))
+                    using (var writer = WriterFactory.Open(tarFileStream, ArchiveType.Tar, writerOptions))
+                    {
+                        using (var fileStream = System.IO.File.OpenRead(inputFilePath))
+                        {
+                            writer.Write(file.FileName, fileStream);
+                            CopyStreamWithProgress(fileStream, new MemoryStream(), file);
+                        }
+                
+                        //using (var fileStream = System.IO.File.OpenRead(inputFilePath))
+                        //{
+                        //    // 進捗状況を追跡しながらデータをコピー
+                        //    var buffer = new byte[81920]; int bytesRead;
+                        //    long totalBytesCopied = 0;
+                        //    long totalBytes = fileStream.Length;
+                        //    while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                        //    {
+                        //        writer.Write(file.FileName, buffer, 0, bytesRead);
+                        //        totalBytesCopied += bytesRead;
+                        //        file.Prog = Math.Round((totalBytesCopied / (double)totalBytes) * 100, 0);
+                        //    }
+                        //}
+                    }
+                }
+                
+                private void CreateGZipArchive(FileInfoModel file, string extension, Encoding encoding)
+                {
+                    string inputFilePath = file.FolderName + "\\" + file.FileName;
+                    string outputFilePath = file.FolderName + "\\" + Path.GetFileNameWithoutExtension(inputFilePath) + extension;
+                    WriterOptions writerOptions = new WriterOptions(CompressionType.GZip) { LeaveStreamOpen = true };
+                    writerOptions.ArchiveEncoding.Default = encoding;
+                    using (var gzipFileStream = System.IO.File.OpenWrite(outputFilePath))
+                    using (var writer = WriterFactory.Open(gzipFileStream, ArchiveType.GZip, writerOptions))
+                    {
+                        using (var fileStream = System.IO.File.OpenRead(inputFilePath))
+                        {
+                            writer.Write(file.FileName, fileStream);
+                            CopyStreamWithProgress(fileStream, new MemoryStream(), file);
+                        }
+                    }
+                }
+                
+                private void CreateBZip2Archive(FileInfoModel file, string extension, Encoding encoding)
+                {
+                    string inputFilePath = file.FolderName + "\\" + file.FileName;
+                    string outputFilePath = file.FolderName + "\\" + Path.GetFileNameWithoutExtension(inputFilePath) + ".tar" + extension;
+                    WriterOptions writerOptions = new WriterOptions(CompressionType.BZip2) { LeaveStreamOpen = true };
+                    writerOptions.ArchiveEncoding.Default = encoding;
+                    using (var bzip2FileStream = System.IO.File.OpenWrite(outputFilePath))
+                    using (var writer = WriterFactory.Open(bzip2FileStream, ArchiveType.Tar, writerOptions))
+                    {
+                        using (var fileStream = System.IO.File.OpenRead(inputFilePath))
+                        {
+                            writer.Write(file.FileName, fileStream);
+                            CopyStreamWithProgress(fileStream, new MemoryStream(), file);
+                        }
+                    }
+                }
+                
+                private void CreateLZipArchive(FileInfoModel file, string extension, Encoding encoding)
+                {
+                    string inputFilePath = file.FolderName + "\\" + file.FileName;
+                    string outputFilePath = file.FolderName + "\\" + Path.GetFileNameWithoutExtension(inputFilePath) + ".tar" + extension;
+                    WriterOptions writerOptions = new WriterOptions(CompressionType.LZip) { LeaveStreamOpen = true };
+                    writerOptions.ArchiveEncoding.Default = encoding;
+                    using (var lzipFileStream = System.IO.File.OpenWrite(outputFilePath))
+                    using (var writer = WriterFactory.Open(lzipFileStream, ArchiveType.Tar, writerOptions))
+                    {
+                        using (var fileStream = System.IO.File.OpenRead(inputFilePath))
+                        {
+                            writer.Write(file.FileName, fileStream);
+                            CopyStreamWithProgress(fileStream, new MemoryStream(), file);
+                        }
+                    }
+                }
+                
+                private void CopyStreamWithProgress(Stream input, Stream output, FileInfoModel file)
+                {
+                    long totalBytes = input.Length;
+                    int bufferSize = (int)Math.Min(totalBytes / 100, 81920); // トータルバイト数の1/100または最大で80KB
+                    byte[] buffer = new byte[bufferSize];
+                    long totalBytesCopied = 0;
+                    int bytesRead;
+                
+                    while ((bytesRead = input.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        output.Write(buffer, 0, bytesRead);
+                        totalBytesCopied += bytesRead;
+                        file.Prog = Math.Round((totalBytesCopied / (double)totalBytes) * 100, 0);
+                    }
+                }</code></pre>
+        </article>
+    </div>
+
+    <footer>
+        <div class="wrapper">
+            <p><small>&copy; 2022 大人の学び舎</small></p>
+        </div>
+    </footer>
+</body>
+
+</html>
