@@ -96,62 +96,322 @@
                 "**"とrecursive=Trueを記入します。
             </p>
             <pre><code class="prettyprint">
+                
                 public MainViewModel() 
-{
-    Items = new ObservableCollection<string>();
-}
+                {
+                    Modes = new ObservableCollection<string>() { "private", "public" };
+                
+                    // 初期項目を設定
+                    Products = new ObservableCollection<ItemModel> 
+                    { 
+                        new ItemModel { Name = "all", IsDeletable = false }, 
+                        new ItemModel { Name = "-", IsDeletable = false }
+                    };
+                
+                    Types = new ObservableCollection<ItemModel>
+                    {
+                        new ItemModel { Name = "IS-P検", IsDeletable = false },
+                        new ItemModel { Name = "IS-F検", IsDeletable = false },
+                        new ItemModel { Name = "SLSI-P検", IsDeletable = false },
+                        new ItemModel { Name = "SLSI-F検", IsDeletable = false },
+                        new ItemModel { Name = "FirstFail", IsDeletable = false },
+                        new ItemModel { Name = "閲覧", IsDeletable = false },
+                        new ItemModel { Name = "MaicoTest", IsDeletable = false }
+                    };
+                
+                    Vers = new ObservableCollection<ItemModel>
+                    {
+                        new ItemModel { Name = "all", IsDeletable = false },
+                        new ItemModel { Name = "-", IsDeletable = false }
+                    };
+                }
 
                 [ObservableProperty]
-private string newItemText;
+private string newProductText;
 
 [ObservableProperty]
-private ObservableCollection<string> items;
+private ItemModel selectedProduct;
 
 [ObservableProperty]
-private string selectedItem;
+private ObservableCollection<ItemModel> products = new ObservableCollection<ItemModel>();
+
+[ObservableProperty]
+private string newTypeText;
+
+[ObservableProperty]
+private ItemModel selectedType;
+
+[ObservableProperty]
+private ObservableCollection<ItemModel> types = new ObservableCollection<ItemModel>();
+
+[ObservableProperty]
+private string newVerText;
+
+[ObservableProperty]
+private ItemModel selectedVer;
+
+[ObservableProperty]
+private ObservableCollection<ItemModel> vers = new ObservableCollection<ItemModel>();
 
 [RelayCommand]
-private void AddItem()
+private void AddProduct()
 {
-    if (!string.IsNullOrWhiteSpace(NewItemText))
+    if (!string.IsNullOrWhiteSpace(NewProductText))
     {
-        Items.Add(NewItemText);
-        NewItemText = string.Empty;
+        Products.Add(new ItemModel { Name = NewProductText, IsDeletable = true });
+        NewProductText = string.Empty;
     }
 }
 
-[RelayCommand(CanExecute = nameof(CanRemoveItem))]
-private void RemoveItem()
+[RelayCommand(CanExecute = nameof(CanRemoveProduct))]
+private void RemoveProduct()
 {
-    if (SelectedItem != null)
+    if (SelectedProduct != null && SelectedProduct.IsDeletable)
     {
-        Items.Remove(SelectedItem);
+        Products.Remove(SelectedProduct);
         SelectedItem = null;
     }
 }
 
-private bool CanRemoveItem()
+private bool CanRemoveProduct()
 {
-    return SelectedItem != null;
+    return SelectedProduct != null && SelectedProduct.IsDeletable;
 }
 
-partial void OnSelectedItemChanged(string value) 
-{ 
-    RemoveItemCommand.NotifyCanExecuteChanged(); 
+partial void OnSelectedProductChanged(ItemModel value)
+{
+    RemoveProductCommand.NotifyCanExecuteChanged();
+}
+
+[RelayCommand]
+private void AddType()
+{
+    if (!string.IsNullOrWhiteSpace(NewTypeText))
+    {
+        Types.Add(new ItemModel { Name = NewTypeText, IsDeletable = true });
+        NewTypeText = string.Empty;
+    }
+}
+
+[RelayCommand(CanExecute = nameof(CanRemoveType))]
+private void RemoveType()
+{
+    if (SelectedType != null && SelectedType.IsDeletable)
+    {
+        Types.Remove(SelectedType);
+        SelectedType = null;
+    }
+}
+
+private bool CanRemoveType()
+{
+    return SelectedType != null && SelectedType.IsDeletable;
+}
+
+partial void OnSelectedTypeChanged(ItemModel value)
+{
+    RemoveTypeCommand.NotifyCanExecuteChanged();
+}
+
+[RelayCommand]
+private void AddVer()
+{
+    if (!string.IsNullOrWhiteSpace(NewVerText))
+    {
+        Vers.Add(new ItemModel { Name = NewVerText, IsDeletable = true });
+        NewVerText = string.Empty;
+    }
+}
+
+[RelayCommand(CanExecute = nameof(CanRemoveVer))]
+private void RemoveVer()
+{
+    if (SelectedVer != null && SelectedVer.IsDeletable)
+    {
+        Vers.Remove(SelectedVer);
+        SelectedVer = null;
+    }
+}
+
+private bool CanRemoveVer()
+{
+    return SelectedVer != null && SelectedVer.IsDeletable;
+}
+
+partial void OnSelectedVerChanged(ItemModel value)
+{
+    RemoveVerCommand.NotifyCanExecuteChanged();
+}
+
+public class ItemModel
+{
+    public string Name { get; set; }
+    public bool IsDeletable { get; set; }
 }
 
 //xaml.cs
-private void TextBox_KeyDown(object sender, KeyEventArgs e)
+private void ProductTextBox_KeyDown(object sender, KeyEventArgs e)
 {
     if (e.Key == Key.Enter)
     {
         var viewModel = DataContext as MainViewModel;
-        if (viewModel != null && viewModel.AddItemCommand.CanExecute(null))
+        if (viewModel != null && viewModel.AddProductCommand.CanExecute(null))
         {
-            viewModel.AddItemCommand.Execute(null);
+            viewModel.AddProductCommand.Execute(null);
         }
     }
 }
+
+private void TypeTextBox_KeyDown(object sender, KeyEventArgs e)
+{
+    if (e.Key == Key.Enter)
+    {
+        var viewModel = DataContext as MainViewModel;
+        if (viewModel != null && viewModel.AddTypeCommand.CanExecute(null))
+        {
+            viewModel.AddTypeCommand.Execute(null);
+        }
+    }
+}
+
+private void VerTextBox_KeyDown(object sender, KeyEventArgs e)
+{
+    if (e.Key == Key.Enter)
+    {
+        var viewModel = DataContext as MainViewModel;
+        if (viewModel != null && viewModel.AddVerCommand.CanExecute(null))
+        {
+            viewModel.AddVerCommand.Execute(null);
+        }
+    }
+}
+
+//xaml
+<!--<Grid>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="auto"/>
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Orientation="Horizontal">
+        <ComboBox Margin="2 4 2 4" Width="100"
+                  materialDesign:HintAssist.Hint="Mode"
+                  Style="{StaticResource MaterialDesignFilledComboBox}"
+                  ItemsSource="{Binding Modes}" SelectedItem="{Binding SelectedMode}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+    </StackPanel>
+
+    <Grid Grid.Row="1">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Product" Margin="8 4 4 4" FontWeight="Bold" TextDecorations="Underline" />
+
+            <StackPanel Grid.Row="1" Orientation="Vertical">
+                <Button Command="{Binding AddProductCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Add" />
+                <TextBox Margin="6 4 6 4" Text="{Binding NewProductText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="White" Style="{StaticResource MaterialDesignTextBox}" KeyDown="ProductTextBox_KeyDown"/>
+            </StackPanel>
+
+            <ListBox Grid.Row="2" Background="White" Margin ="2 4 2 4" Width="100"
+                     BorderBrush="LightGray" BorderThickness="1"
+                     ItemsSource="{Binding Products}" 
+                     SelectedItem="{Binding SelectedProduct}" 
+                     Style="{StaticResource MaterialDesignListBox}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" Margin="0 -2 0 -2"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Button Grid.Row="3" Command="{Binding RemoveProductCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Del" />
+        </Grid>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Type" Margin="8 4 4 4" FontWeight="Bold" TextDecorations="Underline" />
+
+            <StackPanel Grid.Row="1" Orientation="Vertical">
+                <Button Command="{Binding AddTypeCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Add" />
+                <TextBox Margin="6 4 6 4" Text="{Binding NewTypeText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="White" Style="{StaticResource MaterialDesignTextBox}" KeyDown="TypeTextBox_KeyDown"/>
+            </StackPanel>
+
+            <ListBox Grid.Row="2" Background="White" Margin ="2 4 2 4" Width="100"
+                     BorderBrush="LightGray" BorderThickness="1"
+                     ItemsSource="{Binding Types}" 
+                     SelectedItem="{Binding SelectedType}" 
+                     Style="{StaticResource MaterialDesignListBox}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" Margin="0 -2 0 -2"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Button Grid.Row="3" Command="{Binding RemoveTypeCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Del" />
+        </Grid>
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Ver" Margin="8 4 4 4" FontWeight="Bold" TextDecorations="Underline" />
+
+            <StackPanel Grid.Row="1" Orientation="Vertical">
+                <Button Command="{Binding AddVerCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Add" />
+                <TextBox Margin="6 4 6 4" Text="{Binding NewVerText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="White" Style="{StaticResource MaterialDesignTextBox}" KeyDown="VerTextBox_KeyDown"/>
+            </StackPanel>
+
+            <ListBox Grid.Row="2" Background="White" Margin ="2 4 2 4" Width="100"
+                     BorderBrush="LightGray" BorderThickness="1"
+                     ItemsSource="{Binding Vers}" 
+                     SelectedItem="{Binding SelectedVer}" 
+                     Style="{StaticResource MaterialDesignListBox}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" Margin="0 -2 0 -2"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Button Grid.Row="3" Command="{Binding RemoveVerCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Del" />
+        </Grid>
+    </Grid>
+
+</Grid>-->
             </code></pre>
         </article>
     </div>
