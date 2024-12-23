@@ -110,13 +110,13 @@
                 
                     Types = new ObservableCollection<ItemModel>
                     {
-                        new ItemModel { Name = "IS-P検", IsDeletable = false },
-                        new ItemModel { Name = "IS-F検", IsDeletable = false },
-                        new ItemModel { Name = "SLSI-P検", IsDeletable = false },
-                        new ItemModel { Name = "SLSI-F検", IsDeletable = false },
-                        new ItemModel { Name = "FirstFail", IsDeletable = false },
-                        new ItemModel { Name = "閲覧", IsDeletable = false },
-                        new ItemModel { Name = "MaicoTest", IsDeletable = false }
+                        new ItemModel { Name = "test1", IsDeletable = false },
+                        new ItemModel { Name = "test2", IsDeletable = false },
+                        new ItemModel { Name = "test3", IsDeletable = false },
+                        new ItemModel { Name = "test4", IsDeletable = false },
+                        new ItemModel { Name = "test5", IsDeletable = false },
+                        new ItemModel { Name = "test6", IsDeletable = false },
+                        new ItemModel { Name = "test7", IsDeletable = false }
                     };
                 
                     Vers = new ObservableCollection<ItemModel>
@@ -287,131 +287,131 @@ private void VerTextBox_KeyDown(object sender, KeyEventArgs e)
 }
 
 //xaml
-<Grid>
-    <Grid.RowDefinitions>
-        <RowDefinition Height="auto"/>
-        <RowDefinition Height="*"/>
-        <RowDefinition Height="auto"/>
-    </Grid.RowDefinitions>
+&lt;Grid&gt;
+    &lt;Grid.RowDefinitions&gt;
+        &lt;RowDefinition Height="auto"/&gt;
+        &lt;RowDefinition Height="*"/&gt;
+        &lt;RowDefinition Height="auto"/&gt;
+    &lt;/Grid.RowDefinitions&gt;
 
-    <StackPanel Grid.Row="0" Orientation="Horizontal">
-        <ComboBox Margin="2 4 2 4" Width="100"
+    &lt;StackPanel Grid.Row="0" Orientation="Horizontal"&gt;
+        &lt;ComboBox Margin="2 4 2 4" Width="100"
                   materialDesign:HintAssist.Hint="Mode"
                   Style="{StaticResource MaterialDesignFilledComboBox}"
-                  ItemsSource="{Binding Modes}" SelectedItem="{Binding SelectedMode}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+                  ItemsSource="{Binding Modes}" SelectedItem="{Binding SelectedMode}"&gt;
+            &lt;ComboBox.ItemTemplate&gt;
+                &lt;DataTemplate&gt;
+                    &lt;TextBlock Text="{Binding}" /&gt;
+                &lt;/DataTemplate&gt;
+            &lt;/ComboBox.ItemTemplate&gt;
+        &lt;/ComboBox&gt;
 
-    </StackPanel>
+    &lt;/StackPanel&gt;
 
-    <Grid Grid.Row="1">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-        </Grid.ColumnDefinitions>
+    &lt;Grid Grid.Row="1"&gt;
+        &lt;Grid.ColumnDefinitions&gt;
+            &lt;ColumnDefinition Width="auto"/&gt;
+            &lt;ColumnDefinition Width="auto"/&gt;
+            &lt;ColumnDefinition Width="auto"/&gt;
+            &lt;ColumnDefinition Width="auto"/&gt;
+            &lt;ColumnDefinition Width="auto"/&gt;
+        &lt;/Grid.ColumnDefinitions&gt;
 
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
+        &lt;Grid Grid.Column="0"&gt;
+            &lt;Grid.RowDefinitions&gt;
+                &lt;RowDefinition Height="auto"/&gt;
+                &lt;RowDefinition Height="auto"/&gt;
+                &lt;RowDefinition Height="*"/&gt;
+                &lt;RowDefinition Height="auto"/&gt;
+            &lt;/Grid.RowDefinitions&gt;
 
-            <TextBlock Text="Product" Margin="8 4 4 4" FontWeight="Bold" TextDecorations="Underline" />
+            &lt;TextBlock Text="Product" Margin="8 4 4 4" FontWeight="Bold" TextDecorations="Underline" /&gt;
 
-            <StackPanel Grid.Row="1" Orientation="Vertical">
-                <Button Command="{Binding AddProductCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Add" />
-                <TextBox Margin="6 4 6 4" Text="{Binding NewProductText, UpdateSourceTrigger=PropertyChanged}"
-                         Background="White" Style="{StaticResource MaterialDesignTextBox}" KeyDown="ProductTextBox_KeyDown"/>
-            </StackPanel>
+            &lt;StackPanel Grid.Row="1" Orientation="Vertical"&gt;
+                &lt;Button Command="{Binding AddProductCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Add" /&gt;
+                &lt;TextBox Margin="6 4 6 4" Text="{Binding NewProductText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="White" Style="{StaticResource MaterialDesignTextBox}" KeyDown="ProductTextBox_KeyDown"/&gt;
+            &lt;/StackPanel&gt;
 
-            <ListBox Grid.Row="2" Background="White" Margin ="2 4 2 4" Width="100"
+            &lt;ListBox Grid.Row="2" Background="White" Margin ="2 4 2 4" Width="100"
                      BorderBrush="LightGray" BorderThickness="1"
                      ItemsSource="{Binding Products}" 
                      SelectedItem="{Binding SelectedProduct}" 
-                     Style="{StaticResource MaterialDesignListBox}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" Margin="0 -2 0 -2"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                     Style="{StaticResource MaterialDesignListBox}"&gt;
+                &lt;ListBox.ItemTemplate&gt;
+                    &lt;DataTemplate&gt;
+                        &lt;TextBlock Text="{Binding Name}" Margin="0 -2 0 -2"/&gt;
+                    &lt;/DataTemplate&gt;
+                &lt;/ListBox.ItemTemplate&gt;
+            &lt;/ListBox&gt;
 
-            <Button Grid.Row="3" Command="{Binding RemoveProductCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Del" />
-        </Grid>
+            &lt;Button Grid.Row="3" Command="{Binding RemoveProductCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Del" /&gt;
+        &lt;/Grid&gt;
 
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
+        &lt;Grid Grid.Column="1"&gt;
+            &lt;Grid.RowDefinitions&gt;
+                &lt;RowDefinition Height="auto"/&gt;
+                &lt;RowDefinition Height="auto"/&gt;
+                &lt;RowDefinition Height="*"/&gt;
+                &lt;RowDefinition Height="auto"/&gt;
+            &lt;/Grid.RowDefinitions&gt;
 
-            <TextBlock Text="Type" Margin="8 4 4 4" FontWeight="Bold" TextDecorations="Underline" />
+            &lt;TextBlock Text="Type" Margin="8 4 4 4" FontWeight="Bold" TextDecorations="Underline" /&gt;
 
-            <StackPanel Grid.Row="1" Orientation="Vertical">
-                <Button Command="{Binding AddTypeCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Add" />
-                <TextBox Margin="6 4 6 4" Text="{Binding NewTypeText, UpdateSourceTrigger=PropertyChanged}"
-                         Background="White" Style="{StaticResource MaterialDesignTextBox}" KeyDown="TypeTextBox_KeyDown"/>
-            </StackPanel>
+            &lt;StackPanel Grid.Row="1" Orientation="Vertical"&gt;
+                &lt;Button Command="{Binding AddTypeCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Add" /&gt;
+                &lt;TextBox Margin="6 4 6 4" Text="{Binding NewTypeText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="White" Style="{StaticResource MaterialDesignTextBox}" KeyDown="TypeTextBox_KeyDown"/&gt;
+            &lt;/StackPanel&gt;
 
-            <ListBox Grid.Row="2" Background="White" Margin ="2 4 2 4" Width="100"
+            &lt;ListBox Grid.Row="2" Background="White" Margin ="2 4 2 4" Width="100"
                      BorderBrush="LightGray" BorderThickness="1"
                      ItemsSource="{Binding Types}" 
                      SelectedItem="{Binding SelectedType}" 
-                     Style="{StaticResource MaterialDesignListBox}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" Margin="0 -2 0 -2"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                     Style="{StaticResource MaterialDesignListBox}"&gt;
+                &lt;ListBox.ItemTemplate&gt;
+                    &lt;DataTemplate&gt;
+                        &lt;TextBlock Text="{Binding Name}" Margin="0 -2 0 -2"/&gt;
+                    &lt;/DataTemplate&gt;
+                &lt;/ListBox.ItemTemplate&gt;
+            &lt;/ListBox&gt;
 
-            <Button Grid.Row="3" Command="{Binding RemoveTypeCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Del" />
-        </Grid>
+            &lt;Button Grid.Row="3" Command="{Binding RemoveTypeCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Del" /&gt;
+        &lt;/Grid&gt;
 
-        <Grid Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
+        &lt;Grid Grid.Column="2"&gt;
+            &lt;Grid.RowDefinitions&gt;
+                &lt;RowDefinition Height="auto"/&gt;
+                &lt;RowDefinition Height="auto"/&gt;
+                &lt;RowDefinition Height="*"/&gt;
+                &lt;RowDefinition Height="auto"/&gt;
+            &lt;/Grid.RowDefinitions&gt;
 
-            <TextBlock Text="Ver" Margin="8 4 4 4" FontWeight="Bold" TextDecorations="Underline" />
+            &lt;TextBlock Text="Ver" Margin="8 4 4 4" FontWeight="Bold" TextDecorations="Underline" /&gt;
 
-            <StackPanel Grid.Row="1" Orientation="Vertical">
-                <Button Command="{Binding AddVerCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Add" />
-                <TextBox Margin="6 4 6 4" Text="{Binding NewVerText, UpdateSourceTrigger=PropertyChanged}"
-                         Background="White" Style="{StaticResource MaterialDesignTextBox}" KeyDown="VerTextBox_KeyDown"/>
-            </StackPanel>
+            &lt;StackPanel Grid.Row="1" Orientation="Vertical"&gt;
+                &lt;Button Command="{Binding AddVerCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Add" /&gt;
+                &lt;TextBox Margin="6 4 6 4" Text="{Binding NewVerText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="White" Style="{StaticResource MaterialDesignTextBox}" KeyDown="VerTextBox_KeyDown"/&gt;
+            &lt;/StackPanel&gt;
 
-            <ListBox Grid.Row="2" Background="White" Margin ="2 4 2 4" Width="100"
+            &lt;ListBox Grid.Row="2" Background="White" Margin ="2 4 2 4" Width="100"
                      BorderBrush="LightGray" BorderThickness="1"
                      ItemsSource="{Binding Vers}" 
                      SelectedItem="{Binding SelectedVer}" 
-                     Style="{StaticResource MaterialDesignListBox}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" Margin="0 -2 0 -2"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                     Style="{StaticResource MaterialDesignListBox}"&gt;
+                &lt;ListBox.ItemTemplate&gt;
+                    &lt;DataTemplate&gt;
+                        &lt;TextBlock Text="{Binding Name}" Margin="0 -2 0 -2"/&gt;
+                    &lt;/DataTemplate&gt;
+                &lt;/ListBox.ItemTemplate&gt;
+            &lt;/ListBox&gt;
 
-            <Button Grid.Row="3" Command="{Binding RemoveVerCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Del" />
-        </Grid>
-    </Grid>
+            &lt;Button Grid.Row="3" Command="{Binding RemoveVerCommand}" HorizontalAlignment="Center" Width="90" Margin="2 4 2 4" Content="Del" /&gt;
+        &lt;/Grid&gt;
+    &lt;/Grid&gt;
 
-</Grid>
+&lt;/Grid&gt;
             </code></pre>
         </article>
     </div>
