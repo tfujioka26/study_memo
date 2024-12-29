@@ -69,21 +69,486 @@
                 MainWindow.xaml
             </p>
             <pre><code class="prettyprint">
-                //Window.Resources
-                &lt;Window.Resources&gt;
+//Window.Resources
+&lt;Window.Resources&gt;
     &lt;Storyboard x:Key="FlipAnimation" Completed="FlipAnimation_Completed"&gt;
         &lt;DoubleAnimation Storyboard.TargetName="flipperClassic" 
                          Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)" 
                          From="0" To="180" Duration="0:0:0.3" /&gt;
     &lt;/Storyboard&gt;
 &lt;/Window.Resources&gt;
+
+//TabControl追加
+SelectedIndex="{Binding TabIndex}"
+
+//Home TabItem
+&lt;TabItem&gt;
+&lt;TabItem.Header&gt;
+    &lt;StackPanel Width="auto" Height="auto"&gt;
+        &lt;materialDesign:PackIcon Width="32" Height="32" HorizontalAlignment="Center" Kind="Home" /&gt;
+        &lt;TextBlock HorizontalAlignment="Center" Text="Home" /&gt;
+    &lt;/StackPanel&gt;
+&lt;/TabItem.Header&gt;
+
+&lt;materialDesign:Transitioner AutoApplyTransitionOrigins="True" SelectedIndex="{Binding SlideIndex}"&gt;
+    &lt;materialDesign:Transitioner.InputBindings&gt;
+        &lt;KeyBinding Key="Left" Command="{x:Static materialDesign:Transitioner.MovePreviousCommand}"/&gt;
+        &lt;KeyBinding Key="Right" Command="{x:Static materialDesign:Transitioner.MoveNextCommand}"/&gt;
+    &lt;/materialDesign:Transitioner.InputBindings&gt;
+
+    &lt;!--スタート画面--&gt;
+    &lt;materialDesign:TransitionerSlide&gt;
+        &lt;materialDesign:TransitionerSlide.OpeningEffect&gt;
+            &lt;materialDesign:TransitionEffect Kind="SlideInFromBottom" OffsetTime="0:0:0" Duration="0:0:0.5" /&gt;
+        &lt;/materialDesign:TransitionerSlide.OpeningEffect&gt;
+        &lt;materialDesign:TransitionerSlide.BackwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Right" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.BackwardWipe&gt;
+        &lt;materialDesign:TransitionerSlide.ForwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Left" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.ForwardWipe&gt;
+        
+        &lt;Grid&gt;
+            &lt;Grid&gt;
+                &lt;Grid.RowDefinitions&gt;
+                    &lt;RowDefinition Height="auto" /&gt;
+                    &lt;RowDefinition Height="auto" /&gt;
+                    &lt;RowDefinition Height="*" /&gt;
+                    &lt;RowDefinition Height="*" /&gt;
+                    &lt;RowDefinition Height="auto" /&gt;
+                &lt;/Grid.RowDefinitions&gt;
+
+                &lt;materialDesign:Card Grid.Row="0" Padding="8" Background="DarkRed" Foreground="White" UniformCornerRadius="0"&gt;
+                    &lt;TextBlock HorizontalAlignment="Center" Text="スタート" FontSize="16" TextWrapping="Wrap"/&gt;
+                &lt;/materialDesign:Card&gt;
+
+                &lt;!--モード切り替え--&gt;
+                &lt;StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center"&gt;
+                    &lt;!--&lt;ToggleButton Width="60" Margin="4 8 4 8"
+                                  Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                  ToolTip="ONするとデータ管理モードで動作します"
+                                  IsChecked="{Binding IsToggled, Mode=TwoWay}"&gt;
+                        &lt;materialDesign:ToggleButtonAssist.SwitchTrackOnBackground&gt;
+                            &lt;SolidColorBrush Color="Green" /&gt;
+                        &lt;/materialDesign:ToggleButtonAssist.SwitchTrackOnBackground&gt;
+                        &lt;materialDesign:ToggleButtonAssist.SwitchTrackOffBackground&gt;
+                            &lt;SolidColorBrush Color="LightGray" /&gt;
+                        &lt;/materialDesign:ToggleButtonAssist.SwitchTrackOffBackground&gt;
+                    &lt;/ToggleButton&gt;
+
+                    &lt;TextBlock Text="データ管理モード" FontSize="20" VerticalAlignment="Center" Margin="4 8 4 8" IsEnabled="{Binding IsToggled}"/&gt;--&gt;
+                    &lt;materialDesign:FlipperClassic x:Name="flipperClassic" IsFlipped="{Binding IsFlipped, Mode=TwoWay}"
+                                                   ToolTip="簡易モードとデータ管理モードの切り替え"&gt;
+                        &lt;materialDesign:FlipperClassic.FrontContent&gt;
+                            &lt;Button Width="184" Margin="8" Background="MistyRose"
+                                    BorderBrush="Firebrick" BorderThickness="1"
+                                    materialDesign:ButtonAssist.CornerRadius="8"
+                                    Command="{x:Static materialDesign:FlipperClassic.FlipCommand}"
+                                    Content="簡易モード"
+                                    Style="{StaticResource MaterialDesignFlatButton}"/&gt;
+                        &lt;/materialDesign:FlipperClassic.FrontContent&gt;
+                        &lt;materialDesign:FlipperClassic.BackContent&gt;
+                            &lt;Button Width="184" Margin="8" Background="Honeydew"
+                                    BorderBrush="DarkGreen" BorderThickness="1"
+                                    materialDesign:ButtonAssist.CornerRadius="8"
+                                    Command="{x:Static materialDesign:FlipperClassic.FlipCommand}"
+                                    Content="データ管理モード"
+                                    Style="{StaticResource MaterialDesignFlatButton}"/&gt;
+                        &lt;/materialDesign:FlipperClassic.BackContent&gt;
+                    &lt;/materialDesign:FlipperClassic&gt;
+                &lt;/StackPanel&gt;
+
+                &lt;!--通常使用モードのボタン群--&gt;
+                &lt;materialDesign:Card Grid.Row="2" Background="MistyRose" BorderBrush="Firebrick" BorderThickness="1" 
+                     Margin="4 4 4 4" IsEnabled="{Binding IsDataManegementCardEnabled, Converter={StaticResource InvertBooleanConverter}}"&gt;
+                    &lt;StackPanel Orientation="Horizontal" HorizontalAlignment="Center"&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectLogToExcelTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical"  HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="FileExcelOutline" /&gt;
+                                &lt;TextBlock Text="ログエクセル変換" FontSize="18"  HorizontalAlignment="Center" /&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectDataConvertTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical"  HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="FileArrowLeftRightOutline" /&gt;
+                                &lt;TextBlock Text="データ変換" FontSize="18"  HorizontalAlignment="Center" /&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectDecompressTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical"  HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="ArrowSplitHorizontal" /&gt;
+                                &lt;TextBlock Text="解凍" FontSize="18"  HorizontalAlignment="Center" /&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectCompressTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical" HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="ArrowCollapseVertical" /&gt;
+                                &lt;TextBlock Text="圧縮" FontSize="18"  HorizontalAlignment="Center" /&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectSeverCheckTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical" HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="ServerNetwork" /&gt;
+                                &lt;TextBlock Text="サーバーデータチェック" FontSize="18"  HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                    &lt;/StackPanel&gt;
+                &lt;/materialDesign:Card&gt;
+
+                &lt;!--データ管理モードのボタン群--&gt;
+                &lt;materialDesign:Card Grid.Row="3" Background="Honeydew" BorderBrush="DarkGreen" BorderThickness="1"
+                     Margin="4 4 4 4" IsEnabled="{Binding IsDataManegementCardEnabled}"&gt;
+                    &lt;StackPanel Orientation="Horizontal" HorizontalAlignment="Center"&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectLogToExcelTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical"  HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="FileExcelOutline" /&gt;
+                                &lt;TextBlock Text="ログエクセル変換" FontSize="18"  HorizontalAlignment="Center" /&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectDataConvertTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical"  HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="FileArrowLeftRightOutline" /&gt;
+                                &lt;TextBlock Text="データ変換" FontSize="18"  HorizontalAlignment="Center" /&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectDataManegementTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical"  HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="Database" /&gt;
+                                &lt;TextBlock Text="データ管理" FontSize="18"  HorizontalAlignment="Center" /&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectDataExtractTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical" HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="ChartBar" /&gt;
+                                &lt;TextBlock Text="データ抽出" FontSize="18"  HorizontalAlignment="Center" /&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                        &lt;Button Width="150" Height="150" Margin="8 8 8 8" Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                Command="{Binding SelectSeverCheckTabCommand}"&gt;
+                            &lt;StackPanel Orientation="Vertical" HorizontalAlignment="Center"&gt;
+                                &lt;materialDesign:PackIcon Width="80" Height="80" HorizontalAlignment="Center" Kind="ServerNetwork" /&gt;
+                                &lt;TextBlock Text="サーバーデータチェック" FontSize="18"  HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/&gt;
+                            &lt;/StackPanel&gt;
+                        &lt;/Button&gt;
+                    &lt;/StackPanel&gt;
+                &lt;/materialDesign:Card&gt;
+
+                &lt;!--切り替えボタン群--&gt;
+                &lt;StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" IsEnabled="{Binding IsDataManegementCardEnabled}"&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MovePreviousCommand}"
+                            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                            Margin="4 4 4 8" IsEnabled="False"&gt;
+                        &lt;materialDesign:PackIcon Kind="ArrowLeftThick" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFirstSlideCommand}"
+                            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                            Margin="4 4 4 8" IsEnabled="False"&gt;
+                        &lt;materialDesign:PackIcon Kind="HomeFloor1" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectUserSlideCommand}"
+                            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="Account" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectSaveSlideCommand}"
+                            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="StorageTankOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFTPSlideCommand}"
+                            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="FolderDownloadOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectScheduleSlideCommand}"
+                            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="InvoiceTextClockOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MoveNextCommand}"
+                            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="ArrowRightThick" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                &lt;/StackPanel&gt;
+            &lt;/Grid&gt;
+        &lt;/Grid&gt;
+    &lt;/materialDesign:TransitionerSlide&gt;
+
+    &lt;!--ユーザー設定画面--&gt;
+    &lt;materialDesign:TransitionerSlide&gt;
+        &lt;materialDesign:TransitionerSlide.OpeningEffect&gt;
+            &lt;materialDesign:TransitionEffect Kind="SlideInFromBottom" OffsetTime="0:0:0" Duration="0:0:0.5" /&gt;
+        &lt;/materialDesign:TransitionerSlide.OpeningEffect&gt;
+        &lt;materialDesign:TransitionerSlide.BackwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Right" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.BackwardWipe&gt;
+        &lt;materialDesign:TransitionerSlide.ForwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Left" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.ForwardWipe&gt;
+
+        &lt;Grid&gt;
+            &lt;StackPanel Orientation="Vertical"&gt;
+                &lt;materialDesign:Card Padding="8" Background="DarkRed" Foreground="White" UniformCornerRadius="0"&gt;
+                    &lt;TextBlock HorizontalAlignment="Center" Text="ユーザー設定" FontSize="16" TextWrapping="Wrap"/&gt;
+                &lt;/materialDesign:Card&gt;
+            &lt;/StackPanel&gt;
+
+            &lt;StackPanel Orientation="Vertical" VerticalAlignment="Bottom"&gt;
+                &lt;StackPanel Orientation="Horizontal" HorizontalAlignment="Center"&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MovePreviousCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="ArrowLeftThick" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFirstSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="HomeFloor1" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectUserSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8" IsEnabled="False"&gt;
+                        &lt;materialDesign:PackIcon Kind="Account" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectSaveSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="StorageTankOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFTPSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="FolderDownloadOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectScheduleSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="InvoiceTextClockOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MoveNextCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="ArrowRightThick" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                &lt;/StackPanel&gt;
+            &lt;/StackPanel&gt;
+        &lt;/Grid&gt;
+    &lt;/materialDesign:TransitionerSlide&gt;
+
+    &lt;!--保存先設定--&gt;
+    &lt;materialDesign:TransitionerSlide&gt;
+        &lt;materialDesign:TransitionerSlide.OpeningEffect&gt;
+            &lt;materialDesign:TransitionEffect Kind="SlideInFromBottom" OffsetTime="0:0:0" Duration="0:0:0.5" /&gt;
+        &lt;/materialDesign:TransitionerSlide.OpeningEffect&gt;
+        &lt;materialDesign:TransitionerSlide.BackwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Right" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.BackwardWipe&gt;
+        &lt;materialDesign:TransitionerSlide.ForwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Left" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.ForwardWipe&gt;
+
+        &lt;Grid&gt;
+            &lt;StackPanel Orientation="Vertical"&gt;
+                &lt;materialDesign:Card Padding="8" Background="DarkRed" Foreground="White" UniformCornerRadius="0"&gt;
+                    &lt;TextBlock HorizontalAlignment="Center" Text="保存先設定" FontSize="16" TextWrapping="Wrap"/&gt;
+                &lt;/materialDesign:Card&gt;
+            &lt;/StackPanel&gt;
+
+            &lt;StackPanel Orientation="Vertical" VerticalAlignment="Bottom"&gt;
+                &lt;StackPanel Orientation="Horizontal" HorizontalAlignment="Center"&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MovePreviousCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="SkipPrevious" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFirstSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="HomeFloor1" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectUserSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="Account" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectSaveSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8" IsEnabled="False"&gt;
+                        &lt;materialDesign:PackIcon Kind="StorageTankOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFTPSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="FolderDownloadOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectScheduleSlideCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="InvoiceTextClockOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MoveNextCommand}"
+            Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+            Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="SkipNext" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                &lt;/StackPanel&gt;
+            &lt;/StackPanel&gt;
+        &lt;/Grid&gt;
+    &lt;/materialDesign:TransitionerSlide&gt;
+
+    &lt;!--FTP設定--&gt;
+    &lt;materialDesign:TransitionerSlide&gt;
+        &lt;materialDesign:TransitionerSlide.OpeningEffect&gt;
+            &lt;materialDesign:TransitionEffect Kind="SlideInFromBottom" OffsetTime="0:0:0" Duration="0:0:0.5" /&gt;
+        &lt;/materialDesign:TransitionerSlide.OpeningEffect&gt;
+        &lt;materialDesign:TransitionerSlide.BackwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Right" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.BackwardWipe&gt;
+        &lt;materialDesign:TransitionerSlide.ForwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Left" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.ForwardWipe&gt;
+
+        &lt;Grid&gt;
+            &lt;StackPanel Orientation="Vertical"&gt;
+                &lt;materialDesign:Card Padding="8" Background="DarkRed" Foreground="White" UniformCornerRadius="0"&gt;
+                    &lt;TextBlock HorizontalAlignment="Center" Text="FTP設定" FontSize="16" TextWrapping="Wrap"/&gt;
+                &lt;/materialDesign:Card&gt;
+            &lt;/StackPanel&gt;
+
+            &lt;StackPanel Orientation="Vertical" VerticalAlignment="Bottom"&gt;
+                &lt;StackPanel Orientation="Horizontal" HorizontalAlignment="Center"&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MovePreviousCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="SkipPrevious" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFirstSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="HomeFloor1" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectUserSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="Account" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectSaveSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="StorageTankOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFTPSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8" IsEnabled="False"&gt;
+                        &lt;materialDesign:PackIcon Kind="FolderDownloadOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectScheduleSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="InvoiceTextClockOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MoveNextCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="SkipNext" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                &lt;/StackPanel&gt;
+            &lt;/StackPanel&gt;
+        &lt;/Grid&gt;
+    &lt;/materialDesign:TransitionerSlide&gt;
+
+    &lt;!--スケジューラー設定--&gt;
+    &lt;materialDesign:TransitionerSlide&gt;
+        &lt;materialDesign:TransitionerSlide.OpeningEffect&gt;
+            &lt;materialDesign:TransitionEffect Kind="SlideInFromBottom" OffsetTime="0:0:0" Duration="0:0:0.5" /&gt;
+        &lt;/materialDesign:TransitionerSlide.OpeningEffect&gt;
+        &lt;materialDesign:TransitionerSlide.BackwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Right" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.BackwardWipe&gt;
+        &lt;materialDesign:TransitionerSlide.ForwardWipe&gt;
+            &lt;materialDesign:CircleWipe /&gt;
+            &lt;!--&lt;materialDesign:SlideWipe Direction="Left" /&gt;--&gt;
+        &lt;/materialDesign:TransitionerSlide.ForwardWipe&gt;
+        &lt;Grid&gt;
+            &lt;StackPanel Orientation="Vertical"&gt;
+                &lt;materialDesign:Card Padding="8" Background="DarkRed" Foreground="White" UniformCornerRadius="0"&gt;
+                    &lt;TextBlock HorizontalAlignment="Center" Text="スケジューラー設定" FontSize="16" TextWrapping="Wrap"/&gt;
+                &lt;/materialDesign:Card&gt;
+            &lt;/StackPanel&gt;
+
+            &lt;StackPanel Orientation="Vertical" VerticalAlignment="Bottom"&gt;
+                &lt;StackPanel Orientation="Horizontal" HorizontalAlignment="Center"&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MovePreviousCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="SkipPrevious" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFirstSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="HomeFloor1" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectUserSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="Account" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectSaveSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="StorageTankOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectFTPSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8"&gt;
+                        &lt;materialDesign:PackIcon Kind="FolderDownloadOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{Binding SelectScheduleSlideCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8" IsEnabled="False" &gt;
+                        &lt;materialDesign:PackIcon Kind="InvoiceTextClockOutline" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                    &lt;Button Command="{x:Static materialDesign:Transitioner.MoveNextCommand}"
+Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+Margin="4 4 4 8" IsEnabled="False"&gt;
+                        &lt;materialDesign:PackIcon Kind="SkipNext" Width="30" Height="30"/&gt;
+                    &lt;/Button&gt;
+                &lt;/StackPanel&gt;
+            &lt;/StackPanel&gt;
+        &lt;/Grid&gt;
+    &lt;/materialDesign:TransitionerSlide&gt;
+&lt;/materialDesign:Transitioner&gt;
+
+&lt;/TabItem&gt;
+
+//Data Manegement
+//*** 準備中 ***
             </code></pre>
 
             <p>
                 MainWindow.xaml.cs
             </p>
             <pre><code class="prettyprint">
-                //Home用
+//Home用
 private void FlipAnimation_Completed(object sender, EventArgs e) 
 { 
     if (DataContext is MainViewModel viewModel) 
@@ -97,21 +562,127 @@ private void FlipAnimation_Completed(object sender, EventArgs e)
                 MainViewModel.cs
             </p>
             <pre><code class="prettyprint">
-                
+                //コンストラクタ
+                //Manegement
+Headers = new ObservableCollection<string>() { "DataName", "link", "Type", "Ver", "Lot", "Slot", "Lot-Slot", "Pro" };
+
+foreach(var header in Headers)
+{
+    HeaderFilters.Add(header, "");  //初期値は空のデータを格納
+}
+
+SelectedKey = Headers[0]; 
+UpdateValueText();
+
+//Home
+IsDataManegementCardEnabled = IsFlipped;
             </code></pre>
 
             <p>
                 MainViewModel.Home.cs
             </p>
             <pre><code class="prettyprint">
+                [ObservableProperty]
+                private int slideIndex = 0;
                 
+                [ObservableProperty]
+                private bool isToggled;
+                
+                [ObservableProperty]
+                private bool isFlipped;
+                
+                partial void OnIsFlippedChanged(bool value) 
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke(() => 
+                    { 
+                        Storyboard flipAnimation = (Storyboard)System.Windows.Application.Current.MainWindow.FindResource("FlipAnimation");
+                        flipAnimation.Begin(); }); 
+                }
+                
+                [ObservableProperty]
+                private int tabIndex = 0;
+                
+                [ObservableProperty] 
+                private bool isDataManegementCardEnabled;
+                
+                [RelayCommand]
+                private void SelectFirstSlide()
+                {
+                    SlideIndex = 0;
+                }
+                
+                [RelayCommand]
+                private void SelectUserSlide()
+                {
+                    SlideIndex = 1;
+                }
+                
+                [RelayCommand]
+                private void SelectSaveSlide()
+                {
+                    SlideIndex = 2;
+                }
+                
+                [RelayCommand]
+                private void SelectFTPSlide()
+                {
+                    SlideIndex = 3;
+                }
+                
+                [RelayCommand]
+                private void SelectScheduleSlide()
+                {
+                    SlideIndex = 4;
+                }
+                
+                [RelayCommand]
+                private void SelectLogToExcelTab() 
+                { 
+                    TabIndex = 1;
+                }
+                
+                [RelayCommand]
+                private void SelectDataConvertTab()
+                {
+                    TabIndex = 2;
+                }
+                
+                [RelayCommand]
+                private void SelectDataManegementTab()
+                {
+                    TabIndex = 3;
+                }
+                
+                [RelayCommand]
+                private void SelectDataExtractTab()
+                {
+                    TabIndex = 4;
+                }
+                
+                [RelayCommand]
+                private void SelectDecompressTab()
+                {
+                    TabIndex = 5;
+                }
+                
+                [RelayCommand]
+                private void SelectCompressTab()
+                {
+                    TabIndex = 6;
+                }
+                
+                [RelayCommand]
+                private void SelectSeverCheckTab()
+                {
+                    TabIndex = 7;
+                }
             </code></pre>
 
             <p>
                 MainViewModel.Manegement.cs
             </p>
             <pre><code class="prettyprint">
-                
+                // *** 準備中 ***
             </code></pre>
         </article>
     </div>
