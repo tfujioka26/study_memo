@@ -3044,7 +3044,8 @@ namespace DataManager
                 ManegementTab.xaml.cs
             </p>
             <pre><code class="prettyprint">
-                using System.Windows.Controls;
+                using System.Diagnostics;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using DataFormats = System.Windows.DataFormats;
@@ -3125,7 +3126,33 @@ namespace DataManager
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.ToString()) { UseShellExecute = true });
+            //System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.ToString()) { UseShellExecute = true });
+            //e.Handled = true;
+
+            var menu = new ContextMenu();
+            var openItem = new MenuItem { Header = "ファイルを開く" };
+            var openFolderItem = new MenuItem { Header = "フォルダを開く" };
+
+            openItem.Click += (s, args) =&gt;
+            {
+                Process.Start(new ProcessStartInfo(e.Uri.ToString()) { UseShellExecute = true });
+            };
+
+            openFolderItem.Click += (s, args) =&gt;
+            {
+                string? folderPath = System.IO.Path.GetDirectoryName(e.Uri.LocalPath);
+                if (folderPath == null)
+                {
+                    e.Handled = true;
+                    return;
+                }
+                Process.Start(new ProcessStartInfo("explorer.exe", folderPath) { UseShellExecute = true });
+            };
+
+            menu.Items.Add(openItem);
+            menu.Items.Add(openFolderItem);
+            menu.IsOpen = true;
+
             e.Handled = true;
         }
 
