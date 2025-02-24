@@ -66,17 +66,272 @@
                 <p class="post-cat">カテゴリー：example</p>
             </header>
 
-            <!-- <p>
-                WO2022/185785
+            <p>
+                まとめ用(https://bellcurve.jp/statistics/blog/15348.html)
             </p>
             <pre><code class="prettyprint">
-                ・位相差画素の飽和拡大
-                ・1画素の2PD。2PDの分離を斜めにしてコーナーにSFやFDを形成しレイアウト効率アップ
-                ・オーバーフローパスを2PDで共用
-                ・貫通の側壁。側壁からP型を拡散させる。底部だけでなく側面のPN接合で飽和アップ
-            </code></pre> -->
+                Option Explicit
 
-            <a href="sample0.xlsx" download="sample.xlsx">ファイルをダウンロード</a>
+Sub GoToSummarySheet()
+    Sheet1.Activate
+End Sub
+
+Sub MoveRightSheet()
+    With Application
+        .ScreenUpdating = False ' スクリーンアップデートの停止
+        .Calculation = xlCalculationManual  ' 自動計算の停止
+        .EnableEvents = False   ' イベントの無効化
+'        ' オブジェクトの非表示
+'        For Each shp In ws.Shapes
+'            shp.Visible = False
+'        Next shp
+'        ws.Visible = xlSheetVeryHidden  ' シートの非表示
+    End With
+
+    Dim ws As Worksheet
+    On Error Resume Next
+    Set ws = ActiveSheet.Next
+    If Not ws Is Nothing Then
+        ws.Activate
+    Else
+        MsgBox "これ以上右のシートはありません。"
+    End If
+    On Error GoTo 0
+    
+    With Application
+'        ws.Visible = xlSheetVisible ' シートの表示
+'        ' オブジェクトの表示
+'        For Each shp In ws.Shapes
+'            shp.Visible = True
+'        Next shp
+        .Calculation = xlCalculationAutomatic   ' 自動計算の再設定
+'        .Calculate ' 必要に応じて再計算
+        .EnableEvents = True    ' イベントの再有効化
+        .ScreenUpdating = True  ' スクリーンアップデートの再開
+    End With
+End Sub
+
+Sub MoveLeftSheet()
+    With Application
+        .ScreenUpdating = False ' スクリーンアップデートの停止
+        .Calculation = xlCalculationManual  ' 自動計算の停止
+        .EnableEvents = False   ' イベントの無効化
+'        ' オブジェクトの非表示
+'        For Each shp In ws.Shapes
+'            shp.Visible = False
+'        Next shp
+'        ws.Visible = xlSheetVeryHidden  ' シートの非表示
+    End With
+    
+    Dim ws As Worksheet
+    On Error Resume Next
+    Set ws = ActiveSheet.Previous
+    If Not ws Is Nothing Then
+        ws.Activate
+    Else
+        MsgBox "これ以上左のシートはありません。"
+    End If
+    On Error GoTo 0
+    
+    With Application
+'        ws.Visible = xlSheetVisible ' シートの表示
+'        ' オブジェクトの表示
+'        For Each shp In ws.Shapes
+'            shp.Visible = True
+'        Next shp
+        .Calculation = xlCalculationAutomatic   ' 自動計算の再設定
+'        .Calculate ' 必要に応じて再計算
+        .EnableEvents = True    ' イベントの再有効化
+        .ScreenUpdating = True  ' スクリーンアップデートの再開
+    End With
+End Sub
+
+Sub MakeSheet()
+    With Application
+        .ScreenUpdating = False ' スクリーンアップデートの停止
+        .Calculation = xlCalculationManual  ' 自動計算の停止
+        .EnableEvents = False   ' イベントの無効化
+'        ' オブジェクトの非表示
+'        For Each shp In ws.Shapes
+'            shp.Visible = False
+'        Next shp
+'        ws.Visible = xlSheetVeryHidden  ' シートの非表示
+    End With
+    
+    'メイン処理
+    Dim wsSum As Worksheet, wsForm As Worksheet, ws As Worksheet
+    Set wsSum = Sheet1
+    Set wsForm = Sheet3
+    
+    Dim i As Long, sheetExists  As Boolean, wsName As Worksheet
+    i = 2
+    Do While wsSum.Cells(i, 1).Value &lt;&gt; ""
+    
+        sheetExists = False
+        For Each wsName In ThisWorkbook.Sheets
+            If wsName.Name = wsSum.Cells(i, 1).Value Then
+                sheetExists = True
+                Exit For
+            End If
+        Next wsName
+        
+        If sheetExists Then
+            MsgBox wsSum.Cells(i, 1).Value & " は既に存在します。"
+        Else
+            wsForm.Copy After:=Sheets(Sheets.Count) ' シートの最後にコピー
+            ' 新しく作成されたシートを取得
+            Set ws = Sheets(Sheets.Count) ' 新しいシートはシートの最後にある
+            ' 新しいシート名を設定
+            Dim displayText As String
+            ws.Name = wsSum.Cells(i, 1).Value
+            displayText = wsSum.Cells(i, 1).Value
+            
+            '新しいシートにSummaryの値を入力
+            
+            Application.Calculate   '再計算
+            
+            '新しいシートのデータを値貼り付け(式を消す)
+            Dim selectedRange As Range
+            
+            'all
+            Set selectedRange = ws.Range(Cells(6, 58), Cells(10, 81))
+            selectedRange.Copy
+            selectedRange.PasteSpecial Paste:=xlPasteValues
+            Application.CutCopyMode = False
+            
+            'H
+            Set selectedRange = ws.Range(Cells(25, 58), Cells(29, 153))
+            selectedRange.Copy
+            selectedRange.PasteSpecial Paste:=xlPasteValues
+            Application.CutCopyMode = False
+            
+            'H
+            Set selectedRange = ws.Range(Cells(34, 58), Cells(38, 137))
+            selectedRange.Copy
+            selectedRange.PasteSpecial Paste:=xlPasteValues
+            Application.CutCopyMode = False
+            
+            'parts
+            Dim h As Long, v As Long, hstep As Long, vstep As Long
+            hstep = 27
+            vstep = 9
+            For h = 0 To 5
+                For v = 0 To 4
+                    Set selectedRange = ws.Range(Cells(43 + v * vstep, 58 + h * hstep), Cells(47 + v * vstep, 81 + h * hstep))
+                    selectedRange.Copy
+                    selectedRange.PasteSpecial Paste:=xlPasteValues
+                    Application.CutCopyMode = False
+                Next v
+            Next h
+            
+            ' リンクを追加するセルを設定
+            Dim linkCell As Range
+            Set linkCell = wsSum.Cells(i, 1)
+            ' 新しいシートへのリンクを設定
+            wsSum.Hyperlinks.Add Anchor:=linkCell, Address:="", SubAddress:=ws.Name & "!A1", TextToDisplay:=displayText
+        End If
+
+        i = i + 1
+    Loop
+    
+    With Application
+'        ws.Visible = xlSheetVisible ' シートの表示
+'        ' オブジェクトの表示
+'        For Each shp In ws.Shapes
+'            shp.Visible = True
+'        Next shp
+        .Calculation = xlCalculationAutomatic   ' 自動計算の再設定
+'        .Calculate ' 必要に応じて再計算
+        .EnableEvents = True    ' イベントの再有効化
+        .ScreenUpdating = True  ' スクリーンアップデートの再開
+    End With
+    
+    MsgBox "完了"
+End Sub
+
+Sub ReDraw()
+
+    With Application
+        .ScreenUpdating = False ' スクリーンアップデートの停止
+        .Calculation = xlCalculationManual  ' 自動計算の停止
+        .EnableEvents = False   ' イベントの無効化
+'        ' オブジェクトの非表示
+'        For Each shp In ws.Shapes
+'            shp.Visible = False
+'        Next shp
+'        ws.Visible = xlSheetVeryHidden  ' シートの非表示
+    End With
+
+    Dim ws As Worksheet
+    Dim chtObj As ChartObject
+    Dim ax As Axis
+
+    ' アクティブシートを設定
+    Set ws = ActiveSheet
+    
+    ' 最小値と最大値を設定（必要に応じて変更）
+    Dim minVal As Double, maxVal As Double
+    Dim lowerVal As Variant, upperVal As Variant
+    minVal = ws.Cells(6, 5).Value
+    maxVal = ws.Cells(5, 5).Value
+    lowerVal = ws.Cells(6, 2).Value
+    upperVal = ws.Cells(5, 2).Value
+    
+    ' シート上の全てのグラフをループ
+    For Each chtObj In ws.ChartObjects
+        With chtObj.Chart
+            ' グラフの縦軸を設定
+            Set ax = .Axes(xlValue)
+            ax.MinimumScale = minVal
+            ax.MaximumScale = maxVal
+            ax.MajorUnit = (maxVal - minVal) / 5
+            
+             '規格線の描画
+             .FullSeriesCollection(4).Select
+             With Selection.Format.Line
+                If upperVal &lt;&gt; "-" Then
+                    .Visible = msoTrue
+                    .ForeColor.RGB = RGB(255, 0, 0)
+                    .Transparency = 0.5
+                Else
+                    .Visible = msoFalse
+                End If
+             End With
+             
+             .FullSeriesCollection(5).Select
+             With Selection.Format.Line
+                If lowerVal &lt;&gt; "-" Then
+                    .Visible = msoTrue
+                    .ForeColor.RGB = RGB(0, 0, 255)
+                    .Transparency = 0.5
+                Else
+                    .Visible = msoFalse
+                End If
+             End With
+             
+        End With
+    Next chtObj
+    
+    Application.CommandBars("Format Object").Visible = False
+    Range("A1").Select
+    
+    With Application
+'        ws.Visible = xlSheetVisible ' シートの表示
+'        ' オブジェクトの表示
+'        For Each shp In ws.Shapes
+'            shp.Visible = True
+'        Next shp
+        .Calculation = xlCalculationAutomatic   ' 自動計算の再設定
+'        .Calculate ' 必要に応じて再計算
+        .EnableEvents = True    ' イベントの再有効化
+        .ScreenUpdating = True  ' スクリーンアップデートの再開
+    End With
+    
+    MsgBox "完了"
+End Sub
+            </code></pre>
+
+            <!-- <a href="sample0.xlsx" download="sample.xlsx">ファイルをダウンロード</a> -->
         </article>
     </div>
 
