@@ -320,7 +320,7 @@ code {
     border-radius: 3px; /* 角丸 */
     /*border: solid 1px #d6dde4;*/ /* 枠線 */
     margin-bottom: 1rem;
-    width: 100%;
+    /* width: 100%; */
     white-space: pre;     /* コードの整形を保持 */
 }
 
