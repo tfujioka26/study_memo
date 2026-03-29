@@ -70,14 +70,343 @@
                 VBA(level diagram)
             </p>
             <pre><code class="prettyprint">
-               
+Option Explicit
+
+Function RGBToHex(rgb As Long) As String
+    Dim r As Long, g As Long, b As Long
+    r = rgb Mod 256
+    g = (rgb \ 256) Mod 256
+    b = (rgb \ 65536) Mod 256
+    RGBToHex = "#" & Right("0" & Hex(r), 2) & Right("0" & Hex(g), 2) & Right("0" & Hex(b), 2)
+End Function
+
+Sub SaveJSON_UTF8(jsonText As String, filePath As String)
+    Dim stream As Object
+    Set stream = CreateObject("ADODB.Stream")
+    stream.Type = 2
+    stream.Charset = "UTF-8"
+    stream.Open
+    stream.WriteText jsonText
+    stream.SaveToFile filePath, 2
+    stream.Close
+End Sub
+
+Sub ExportLevelDiagramJSON()
+
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Sheets("Input")
+
+    Dim json As String
+    json = "{""nodes"":["
+
+    Dim row As Long
+    row = 2
+
+    Dim firstNode As Boolean
+    firstNode = True
+
+    Dim currentNode As String
+
+    '--- nodes & subranges ---
+    Do While ws.Cells(row, 2).Value <> ""
+        If ws.Cells(row, 1).Value <> "" Then
+            If Not firstNode Then
+                json = Left(json, Len(json) - 1) & "]},"
+            End If
+            currentNode = CStr(ws.Cells(row, 1).Value)
+            json = json & "{""name"":""" & currentNode & """,""subranges"":["
+            firstNode = False
+        End If
+
+        Dim vtop As Variant, vbottom As Variant, label As String
+        Dim colorRGB As Long, colorHex As String
+
+        vtop = ws.Cells(row, 2).Value
+        vbottom = ws.Cells(row, 3).Value
+        label = CStr(ws.Cells(row, 4).Value)
+
+        colorRGB = ws.Cells(row, 5).Interior.Color
+        If colorRGB = 0 Then
+            colorHex = "#ffffff"
+        Else
+            colorHex = RGBToHex(colorRGB)
+        End If
+
+        json = json & "{""v_top"":""" & vtop & """,""v_bottom"":""" & vbottom & """,""label"":""" & label & """,""color"":""" & colorHex & """},"
+
+        row = row + 1
+    Loop
+
+    If Right(json, 1) = "," Then json = Left(json, Len(json) - 1)
+    json = json & "]}],"
+
+    '--- connections (J:M) ---
+    json = json & """connections"":["
+    Dim cr As Long
+    cr = 2
+    Do While ws.Cells(cr, 10).Value <> "" ' J列
+        json = json & "{""from"":[""" & CStr(ws.Cells(cr, 10).Value) & """,""" & CStr(ws.Cells(cr, 11).Value) & """],"
+        json = json & """to"":[""" & CStr(ws.Cells(cr, 12).Value) & """,""" & CStr(ws.Cells(cr, 13).Value) & """]},"
+        cr = cr + 1
+    Loop
+    If Right(json, 1) = "," Then json = Left(json, Len(json) - 1)
+    json = json & "],"
+
+    '--- guide_lines (R:W) ---
+    json = json & """guide_lines"":["
+    Dim gr As Long
+    gr = 2
+    Do While ws.Cells(gr, 18).Value <> "" ' R列
+        json = json & "{""from"":[""" _
+            & CStr(ws.Cells(gr, 18).Value) & """,""" _
+            & CStr(ws.Cells(gr, 19).Value) & """,""" _
+            & CStr(ws.Cells(gr, 20).Value) & """,""" _
+            & CStr(ws.Cells(gr, 21).Value) & """],"
+        json = json & """direction"":""" & CStr(ws.Cells(gr, 22).Value) & """,""end_node"":""" _
+            & CStr(ws.Cells(gr, 23).Value) & """},"
+        gr = gr + 1
+    Loop
+    If Right(json, 1) = "," Then json = Left(json, Len(json) - 1)
+    json = json & "]}"
+
+    Dim outPath As String, ts As String, subTitle As String
+    
+    ts = Format(Now, "yymmddhhnnss")
+    subTitle = Sheets("main").Cells(5, 4).Value
+    outPath = ThisWorkbook.Path & "\level_input_" & subTitle & "_" & ts & ".json"
+    Call SaveJSON_UTF8(json, outPath)
+
+    MsgBox "JSON 出力完了: " & outPath
+
+End Sub               
             </code></pre>
 
             <p>
                 python(level diagram)
             </p>
             <pre><code class="prettyprint">
-               
+import json
+import glob
+import os
+from dataclasses import dataclass
+from typing import List, Tuple
+
+@dataclass
+class SubRange:
+    v_top: float
+    v_bottom: float
+    label: str
+    color: str
+
+@dataclass
+class NodeLevel:
+    name: str
+    subranges: List[SubRange]
+
+@dataclass
+class Connection:
+    from_node: str
+    from_label: str
+    to_node: str
+    to_label: str
+
+@dataclass
+class GuideLine:
+    from_node: str
+    from_label: str
+    side: str       # left/right
+    level: str      # max/min
+    direction: str  # left/right
+    end_node: str
+
+def load_nodes_from_json_file(path: str):
+    with open(path, "r", encoding="utf-8-sig") as f:
+        data = json.load(f)
+
+    nodes = []
+    for node in data["nodes"]:
+        subs = []
+        for sr in node["subranges"]:
+            label = str(sr.get("label", ""))
+            v_top = sr.get("v_top", "")
+            v_bottom = sr.get("v_bottom", "")
+            color = sr.get("color", "#ffe082")
+
+            if label == "" or "空欄" in label or v_top == "" or v_bottom == "":
+                continue
+
+            v_top_f = float(v_top)
+            v_bottom_f = float(v_bottom)
+            if v_top_f < v_bottom_f:
+                v_top_f, v_bottom_f = v_bottom_f, v_top_f
+
+            subs.append(SubRange(v_top_f, v_bottom_f, label, color))
+
+        subs.sort(key=lambda s: s.v_top, reverse=True)
+        nodes.append(NodeLevel(node["name"], subs))
+
+    connections = []
+    for c in data.get("connections", []):
+        fn, fl = c["from"]
+        tn, tl = c["to"]
+        connections.append(Connection(fn, fl, tn, tl))
+
+    guide_lines = []
+    for g in data.get("guide_lines", []):
+        fnode, flabel, side, level = g["from"]
+        guide_lines.append(
+            GuideLine(
+                fnode, flabel, side, level,
+                g["direction"], g["end_node"]
+            )
+        )
+
+    return nodes, connections, guide_lines
+
+def render_level_diagram(nodes, connections, guide_lines,
+                         x_step=160, y_scale=80.0,
+                         margin_left=140, margin_top=60,
+                         rail_color="#1a73e8", guide_color="#ff0000",
+                         text_color="#333"):
+
+    def vx(i): return margin_left + i * x_step
+
+    global_vmin = min(sr.v_bottom for n in nodes for sr in n.subranges)
+    global_vmax = max(sr.v_top for n in nodes for sr in n.subranges)
+    v_pad = 0.2 * (global_vmax - global_vmin)
+    v_top = global_vmax + v_pad
+    v_bottom = global_vmin - v_pad
+
+    def vy(v): return margin_top + (v_top - v) * y_scale
+
+    width = margin_left + x_step * (len(nodes) - 1) + 200
+    height = margin_top + int((v_top - v_bottom) * y_scale) + 100
+
+    rect_width = 70
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">']
+
+    # -----------------------------
+    # 電圧目盛（背景グリッド）
+    # -----------------------------
+    import math
+    candidates = [0.1, 0.2, 0.5, 1.0]
+    target_ticks = 8
+    step = min(candidates, key=lambda s: abs(((v_top - v_bottom) / s) - target_ticks))
+
+    v_start = math.ceil(v_bottom / step) * step
+    v_end = math.floor(v_top / step) * step
+
+    v = v_start
+    while v <= v_end + 1e-9:
+        y = vy(v)
+        # 横線（薄いグレー）
+        parts.append(
+            f'<line x1="{margin_left-60}" y1="{y:.1f}" '
+            f'x2="{width-20}" y2="{y:.1f}" stroke="#eeeeee"/>'
+        )
+        # 目盛りラベル
+        parts.append(
+            f'<text x="{margin_left-70}" y="{y+4:.1f}" '
+            f'font-size="11" text-anchor="end" fill="{text_color}">{v:.2f}V</text>'
+        )
+        v += step
+    
+    node_index = {n.name: i for i, n in enumerate(nodes)}
+
+    # ノード描画
+    for i, n in enumerate(nodes):
+        if not n.subranges:
+            continue
+
+        x_left = vx(i) - rect_width / 2
+
+        # parts.append(
+        #     f'<text x="{vx(i)}" y="{vy(n.subranges[0].v_top)-18}" '
+        #     f'font-size="13" text-anchor="middle" fill="{text_color}">{n.name}</text>'
+        # )
+
+        # ノード名（全ノード共通の高さに固定）
+        title_y = margin_top - 10
+        
+        parts.append(
+            f'<text x="{vx(i)}" y="{title_y}" '
+            f'font-size="13" text-anchor="middle" fill="{text_color}">{n.name}</text>'
+        )
+        
+        for sr in n.subranges:
+            y_top = vy(sr.v_top)
+            y_bottom = vy(sr.v_bottom)
+            h = y_bottom - y_top
+
+            parts.append(
+                f'<rect x="{x_left}" y="{y_top}" width="{rect_width}" height="{h}" '
+                f'fill="{sr.color}" stroke="#333"/>'
+            )
+
+            parts.append(
+                f'<text x="{vx(i)}" y="{(y_top+y_bottom)/2}" font-size="10" '
+                f'text-anchor="middle" fill="{text_color}">'
+                f'{sr.label} {sr.v_bottom:.2f}–{sr.v_top:.2f}V</text>'
+            )
+
+    def get_subrange(node_name, label):
+        node = nodes[node_index[node_name]]
+        for sr in node.subranges:
+            if sr.label == label:
+                return sr
+        raise ValueError(f"{label} not found in {node_name}")
+
+    # connections（青破線）
+    for c in connections:
+        i_from = node_index[c.from_node]
+        i_to = node_index[c.to_node]
+
+        x1 = vx(i_from) + rect_width / 2
+        x2 = vx(i_to) - rect_width / 2
+
+        sr_from = get_subrange(c.from_node, c.from_label)
+        sr_to = get_subrange(c.to_node, c.to_label)
+
+        parts.append(
+            f'<line x1="{x1}" y1="{vy(sr_from.v_top)}" x2="{x2}" y2="{vy(sr_to.v_top)}" '
+            f'stroke="{rail_color}" stroke-width="0.5" stroke-dasharray="4,3"/>'
+        )
+        parts.append(
+            f'<line x1="{x1}" y1="{vy(sr_from.v_bottom)}" x2="{x2}" y2="{vy(sr_to.v_bottom)}" '
+            f'stroke="{rail_color}" stroke-width="0.5" stroke-dasharray="4,3"/>'
+        )
+
+    # guide_lines（赤破線）
+    for g in guide_lines:
+        i_from = node_index[g.from_node]
+        i_end = node_index[g.end_node]
+
+        sr = get_subrange(g.from_node, g.from_label)
+        y = vy(sr.v_top if g.level == "max" else sr.v_bottom)
+
+        x1 = vx(i_from) - rect_width/2 if g.side == "left" else vx(i_from) + rect_width/2
+        x2 = vx(i_end) - rect_width/2 if g.direction == "left" else vx(i_end) + rect_width/2
+
+        parts.append(
+            f'<line x1="{x1}" y1="{y}" x2="{x2}" y2="{y}" '
+            f'stroke="{guide_color}" stroke-width="1.0" stroke-dasharray="3,3"/>'
+        )
+
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+if __name__ == "__main__":
+    json_files = glob.glob("level_input_*.json")
+
+    for json_path in json_files:
+        nodes, connections, guide_lines = load_nodes_from_json_file(json_path)
+        svg = render_level_diagram(nodes, connections, guide_lines)
+
+        out_name = os.path.splitext(json_path)[0] + ".svg"
+        with open(out_name, "w", encoding="utf-8") as f:
+            f.write(svg)
+
+        print("出力:", out_name)               
             </code></pre>
 
             <!-- <a href="sample0.xlsx" download="sample.xlsx">ファイルをダウンロード</a> -->
