@@ -69,7 +69,9 @@
             <p>
                 VBA(level diagram)
             </p>
-            <pre><code class="prettyprint">
+            <div class="code-block">
+                <button class="copy-btn">コピー</button>
+                    <pre><code class="prettyprint">
 Option Explicit
 
 Function RGBToHex(rgb As Long) As String
@@ -179,12 +181,15 @@ Sub ExportLevelDiagramJSON()
     MsgBox &quot;JSON 出力完了: &quot; &amp; outPath
 
 End Sub
-            </code></pre>
-
+                </code></pre>
+            </div>
+            
             <p>
                 python(level diagram)
             </p>
-            <pre><code class="prettyprint">
+            <div class="code-block">
+                <button class="copy-btn">コピー</button>
+                <pre><code class="prettyprint">
 import json
 import glob
 import os
@@ -389,8 +394,8 @@ if __name__ == &quot;__main__&quot;:
             f.write(svg)
 
         print(&quot;出力:&quot;, out_name)              
-            </code></pre>
-
+                </code></pre>
+            </div>
             <!-- <a href="sample0.xlsx" download="sample.xlsx">ファイルをダウンロード</a> -->
         </article>
     </div>
@@ -400,6 +405,21 @@ if __name__ == &quot;__main__&quot;:
             <p><small>&copy; 2022 大人の学び舎</small></p>
         </div>
     </footer>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".copy-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const code = btn.nextElementSibling.innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    btn.textContent = "コピー完了";
+                    setTimeout(() => btn.textContent = "コピー", 1500);
+                });
+            });
+        });
+    });
+    </script>
+
 </body>
 
 </html>
