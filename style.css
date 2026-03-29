@@ -305,6 +305,12 @@ article p {
     margin-bottom: 50px;
 }
 
+pre {
+    overflow-x: auto;     /* 横スクロールを許可 */
+    white-space: pre;     /* 折り返し禁止（コードの整形を保持） */
+    max-width: 100%;      /* 枠からはみ出さない */
+}
+
 /* --- code --- */
 code {
     display: inline-block;
@@ -315,6 +321,7 @@ code {
     /*border: solid 1px #d6dde4;*/ /* 枠線 */
     margin-bottom: 1rem;
     width: 100%;
+    white-space: pre;     /* コードの整形を保持 */
 }
 
 /* --- footer --- */
